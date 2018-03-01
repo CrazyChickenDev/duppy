@@ -1,0 +1,13 @@
+duppy
+
+Create a stealthy wired/wireless interface.
+
+Basic idea:
+- Change hostname
+- Change mac address
+- Disable ARP announce / ignore ARP
+- Disable ICMP echo responses
+
+Usage: ./duppy start/stop <interface>
+
+Dependency: Network manager >= 1.4.0
