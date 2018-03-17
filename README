@@ -24,4 +24,4 @@ Dependency:
 Wrote and tested on Parrot OS 3.11
 (Note: This script may cause to slow down the web surfing, but not affect the tools (in some cases, this speed up it!))
 
-Build: g++ -Wall -o duppy duppy.cpp
+Build: g++ -o duppy duppy.cpp
