@@ -509,6 +509,19 @@ void setBackKnownAP(){
 		}
 }
 
+void notify(std::string text){
+
+	int statusCode;
+	std::string command = "/usr/bin/notify-send \"" + text + "\"";
+
+	if ((statusCode = system(command.c_str())) != 0) {
+
+		std::cout << text << std::endl;
+		std::cout << command << std::endl;
+
+	}
+}
+
 int main(int argc, char* argv[]){
 
 	std::cout << "\n";
@@ -576,7 +589,8 @@ int main(int argc, char* argv[]){
 		sleep(1);
 
 		std::cout << "\nDont worry about the \"sudo: unable to resolve host...\" error.\n" << std::endl;
-		std::cout << "Duppy has started!\n" << std::endl;
+		notify("Duppy has started!");
+
 
 	} else if ((initCommand = argv[1]) == stop.c_str()){
 
@@ -620,7 +634,7 @@ int main(int argc, char* argv[]){
 		removeDirectories();
 		sleep(1);
 
-		std::cout << "\nDuppy has stopped!\n" << std::endl;
+		notify("Duppy has stopped!");
 
 	} else {
 
