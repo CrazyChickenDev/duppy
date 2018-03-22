@@ -54,7 +54,7 @@ void stopNetworkManager(){
 
 		if ((statusCode = std::system("service network-manager stop")) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -72,7 +72,7 @@ void startNetworkManager(){
 
 		if ((statusCode = std::system("service network-manager start")) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -92,7 +92,7 @@ void ifconfigDown(const char *interfaceName){
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -114,7 +114,7 @@ void ifconfigUp(const char *interfaceName){
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -184,7 +184,7 @@ void setRandomHostname(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS! ";
+			std::cout << "\e[32mSUCCESS!";
 			std::cout << "(New hostname: " << hostname << ")" << std::endl;
 
 		} else {
@@ -204,7 +204,7 @@ void saveDefaultHostname(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -238,7 +238,7 @@ void restoreDefaultHostname(){
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -258,7 +258,7 @@ void saveDefaultMac(const char *interface){
 
 		if ((statusCode = system(command.c_str())) == 0 ){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -294,7 +294,7 @@ void restoreDefaultMac(const char *interface){
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -312,7 +312,7 @@ void setDuppyNetwork(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -330,7 +330,7 @@ void deleteDuppynetwork(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -350,7 +350,7 @@ void ignoreArp(const char *interface){
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -370,7 +370,7 @@ void restrictArpAnnounce(const char *interface){
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -393,7 +393,7 @@ void allowArp(const char *interface){
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -413,7 +413,7 @@ void enableArpAnnounce(const char *interface){
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -432,7 +432,7 @@ void disableICMP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!";
+			std::cout << "\e[32mSUCCESS!";
 			std::cout << " (WARNING!!!! This affect every interface!)" << std::endl;
 
 		} else {
@@ -451,7 +451,7 @@ void enableICMP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -469,7 +469,7 @@ void removeKnownAP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -488,7 +488,7 @@ void setBackKnownAP(){
 
 		if ((statusCode = system(commandRm.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
@@ -500,7 +500,7 @@ void setBackKnownAP(){
 
 		if ((statusCode = system(commandMove.c_str())) == 0){
 
-			std::cout << "SUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!" << std::endl;
 
 		} else {
 
