@@ -496,6 +496,8 @@ void setBackKnownAP(){
 
 		}
 
+		sleep(1);
+
 		std::cout << "Set back known APs: ";
 
 		if ((statusCode = system(commandMove.c_str())) == 0){
@@ -512,7 +514,7 @@ void setBackKnownAP(){
 void notify(std::string text){
 
 	int statusCode;
-	std::string command = "/usr/bin/notify-send \"" + text + "\"";
+	std::string command = "/usr/bin/notify-send \"Duppy\" \"" + text + "\"";
 
 	if ((statusCode = system(command.c_str())) != 0) {
 
