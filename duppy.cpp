@@ -22,14 +22,14 @@ void createDiretories(){
 
 		if ((statusCode = system("mkdir /tmp/duppy")) != 0 ){
 
-			std::cout << "Create dir in /tmp: \e[31mFAILED!";
+			std::cout << "Create dir in /tmp: \e[31mFAILED!!\e[0m";
 			std::exit(1);
 
 		}
 
 		if ((statusCode = system("mkdir /tmp/duppy/known_ap")) != 0 ){
 
-			std::cout << "Create dir in /tmp/duppy: \e[31mFAILED!!" << std::endl;
+			std::cout << "Create dir in /tmp/duppy: \e[31mFAILED!!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -41,7 +41,7 @@ void removeDirectories(){
 
 		if ((statusCode = system("rm -rf /tmp/duppy")) != 0 ) {
 
-			std::cout << "Remove the /tmp/duppy: \e[31mFAILED!! " << std::endl;
+			std::cout << "Remove the /tmp/duppy: \e[31mFAILED!!\e[0m" << std::endl;
 
 		}
 }
@@ -54,11 +54,11 @@ void stopNetworkManager(){
 
 		if ((statusCode = std::system("service network-manager stop")) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -72,11 +72,11 @@ void startNetworkManager(){
 
 		if ((statusCode = std::system("service network-manager start")) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -92,11 +92,11 @@ void ifconfigDown(const char *interfaceName){
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -114,11 +114,11 @@ void ifconfigUp(const char *interfaceName){
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -136,7 +136,7 @@ std::string checkInterface(const char *interface){
 			myfile.close();
 		} else {
 
-			std::cout << "Open /proc/net/dev to check interface: \e[31mFAILED! " << std::endl;
+			std::cout << "Open /proc/net/dev to check interface: \e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -184,12 +184,12 @@ void setRandomHostname(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!";
+			std::cout << "\e[32mSUCCESS!\e[0m";
 			std::cout << "(New hostname: " << hostname << ")" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -204,11 +204,11 @@ void saveDefaultHostname(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -228,7 +228,7 @@ void restoreDefaultHostname(){
 
 		} else {
 
-			std::cout << "Open /tmp/duppy/hostname: \e[31mFAILED! " << std::endl;;
+			std::cout << "Open /tmp/duppy/hostname: \e[31mFAILED!\e[0m" << std::endl;;
 
 		}
 
@@ -238,11 +238,11 @@ void restoreDefaultHostname(){
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -258,11 +258,11 @@ void saveDefaultMac(const char *interface){
 
 		if ((statusCode = system(command.c_str())) == 0 ){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -284,7 +284,7 @@ void restoreDefaultMac(const char *interface){
 
 		} else {
 
-			std::cout << "Open /tmp/duppy/defaultmac: \e[31mFAILED!";
+			std::cout << "Open /tmp/duppy/defaultmac: \e[31mFAILED!\e[0m";
 
 		}
 
@@ -294,11 +294,11 @@ void restoreDefaultMac(const char *interface){
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -312,11 +312,11 @@ void setDuppyNetwork(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -330,11 +330,11 @@ void deleteDuppynetwork(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -350,11 +350,11 @@ void ignoreArp(const char *interface){
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -370,11 +370,11 @@ void restrictArpAnnounce(const char *interface){
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -393,11 +393,11 @@ void allowArp(const char *interface){
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -413,11 +413,11 @@ void enableArpAnnounce(const char *interface){
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
 
 		}
@@ -432,12 +432,12 @@ void disableICMP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!";
+			std::cout << "\e[32mSUCCESS!\e[0m";
 			std::cout << " (WARNING!!!! This affect every interface!)" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -451,11 +451,11 @@ void enableICMP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -469,11 +469,11 @@ void removeKnownAP(){
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
@@ -488,11 +488,11 @@ void setBackKnownAP(){
 
 		if ((statusCode = system(commandRm.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 
@@ -500,11 +500,11 @@ void setBackKnownAP(){
 
 		if ((statusCode = system(commandMove.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
-			std::cout << "\e[31mFAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 		}
 }
