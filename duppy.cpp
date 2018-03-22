@@ -22,14 +22,14 @@ void createDiretories(){
 
 		if ((statusCode = system("mkdir /tmp/duppy")) != 0 ){
 
-			std::cout << "Create dir in /tmp: FAILED!";
+			std::cout << "Create dir in /tmp: \e[31mFAILED!";
 			std::exit(1);
 
 		}
 
 		if ((statusCode = system("mkdir /tmp/duppy/known_ap")) != 0 ){
 
-			std::cout << "Create dir in /tmp/duppy: FAILED!" << std::endl;
+			std::cout << "Create dir in /tmp/duppy: \e[31mFAILED!!" << std::endl;
 			std::exit(1);
 
 		}
@@ -41,7 +41,7 @@ void removeDirectories(){
 
 		if ((statusCode = system("rm -rf /tmp/duppy")) != 0 ) {
 
-			std::cout << "Remove the /tmp/duppy: FAILED! " << std::endl;
+			std::cout << "Remove the /tmp/duppy: \e[31mFAILED!! " << std::endl;
 
 		}
 }
@@ -58,7 +58,7 @@ void stopNetworkManager(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 			std::exit(1);
 
 		}
@@ -76,7 +76,7 @@ void startNetworkManager(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -96,7 +96,7 @@ void ifconfigDown(const char *interfaceName){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 			std::exit(1);
 
 		}
@@ -118,7 +118,7 @@ void ifconfigUp(const char *interfaceName){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -136,7 +136,7 @@ std::string checkInterface(const char *interface){
 			myfile.close();
 		} else {
 
-			std::cout << "Open /proc/net/dev to check interface: FAILED! " << std::endl;
+			std::cout << "Open /proc/net/dev to check interface: \e[31mFAILED! " << std::endl;
 			std::exit(1);
 
 		}
@@ -189,7 +189,7 @@ void setRandomHostname(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -208,7 +208,7 @@ void saveDefaultHostname(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 			std::exit(1);
 
 		}
@@ -228,7 +228,7 @@ void restoreDefaultHostname(){
 
 		} else {
 
-			std::cout << "Open /tmp/duppy/hostname: FAILED! " << std::endl;;
+			std::cout << "Open /tmp/duppy/hostname: \e[31mFAILED! " << std::endl;;
 
 		}
 
@@ -242,7 +242,7 @@ void restoreDefaultHostname(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -262,7 +262,7 @@ void saveDefaultMac(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED! " << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -284,7 +284,7 @@ void restoreDefaultMac(const char *interface){
 
 		} else {
 
-			std::cout << "Open /tmp/duppy/defaultmac: FAILED!";
+			std::cout << "Open /tmp/duppy/defaultmac: \e[31mFAILED!";
 
 		}
 
@@ -298,7 +298,7 @@ void restoreDefaultMac(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -316,7 +316,7 @@ void setDuppyNetwork(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -334,7 +334,7 @@ void deleteDuppynetwork(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -354,7 +354,7 @@ void ignoreArp(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -374,7 +374,7 @@ void restrictArpAnnounce(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -397,7 +397,7 @@ void allowArp(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -417,7 +417,7 @@ void enableArpAnnounce(const char *interface){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 			std::exit(1);
 
 		}
@@ -437,7 +437,7 @@ void disableICMP(){
 
 		} else {
 
-			std::cout << "FAILED! " << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -455,7 +455,7 @@ void enableICMP(){
 
 		} else {
 
-			std::cout << "FAILED!" << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -473,7 +473,7 @@ void removeKnownAP(){
 
 		} else {
 
-			std::cout << "FAILED! " << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
@@ -492,7 +492,7 @@ void setBackKnownAP(){
 
 		} else {
 
-			std::cout << "FAILED! " << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 
@@ -504,7 +504,7 @@ void setBackKnownAP(){
 
 		} else {
 
-			std::cout << "FAILED! " << std::endl;
+			std::cout << "\e[31mFAILED!" << std::endl;
 
 		}
 }
