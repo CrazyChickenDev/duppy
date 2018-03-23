@@ -303,12 +303,12 @@ void restoreDefaultMac(const char *interface){
 		}
 }
 
-void setDuppyNetwork(){
+void setDuppyNetworkRandom(){
 
 		int statusCode;
-		std::string command = "cp duppynetwork.conf /etc/NetworkManager/conf.d/";
+		std::string command = "cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/";
 
-		std::cout << "Insert duppynetwork.conf: ";
+		std::cout << "Insert duppynetworkRandom.conf: ";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
@@ -321,12 +321,12 @@ void setDuppyNetwork(){
 		}
 }
 
-void deleteDuppynetwork(){
+void deleteDuppynetworkRandom(){
 
 		int statusCode;
-		std::string command = "rm -f /etc/NetworkManager/conf.d/duppynetwork.conf";
+		std::string command = "rm -f /etc/NetworkManager/conf.d/duppynetworkRandom.conf";
 
-		std::cout << "Remove duppynetwork.conf: ";
+		std::cout << "Remove duppynetworkRandom.conf: ";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
@@ -566,7 +566,7 @@ int main(int argc, char* argv[]){
 		ifconfigDown(selectedInterface.c_str());
 		sleep(1);
 
-		setDuppyNetwork();
+		setDuppyNetworkRandom();
 		sleep(1);
 
 		setRandomHostname();
@@ -609,7 +609,7 @@ int main(int argc, char* argv[]){
 		restoreDefaultHostname();
 		sleep(1);
 
-		deleteDuppynetwork();
+		deleteDuppynetworkRandom();
 		sleep(1);
 
 		restoreDefaultMac(selectedInterface.c_str());
