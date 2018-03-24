@@ -282,7 +282,7 @@ void setMac(std::string interface, std::string mac){
 		int statusNumber;
 		std::string command = "ifconfig " + interface + " hw ether " + mac;
 
-		std::cout << "Mac address set to \"" + mac + "\": \t";
+		std::cout << "Mac address set : \t\t";
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
@@ -507,7 +507,6 @@ void notify(std::string text){
 	if ((statusCode = system(command.c_str())) != 0) {
 
 		std::cout << text << std::endl;
-		std::cout << command << std::endl;
 
 	}
 }
@@ -578,15 +577,19 @@ int main(int argc, char* argv[]){
 		startNetworkManager();
 		sleep(1);
 
-		std::cout << "\nDont worry about the \"sudo: unable to resolve host...\" error.\n" << std::endl;
-		notify("Duppy has started!");
+		notify("Started");
+		sleep(1);
 
+		notify("Dont worry about the 'sudo: unable to resolve host...' error");
+		sleep(1);
 
 	} else if ((initCommand = argv[1]) == stop.c_str()){
 
 		//stop duppy
 
 		std::string selectedInterface = checkInterface(argv[2]);
+		std::string defaultMac = getDefaultMac();
+		std::string defaultHostname = getDefaultHostname();
 
 		stopNetworkManager();
 		sleep(1);
@@ -594,13 +597,13 @@ int main(int argc, char* argv[]){
 		ifconfigDown(selectedInterface.c_str());
 		sleep(1);
 
-		setHostname(getDefaultHostname());
+		setHostname(defaultHostname);
 		sleep(1);
 
 		deleteDuppynetworkRandom();
 		sleep(1);
 
-		setMac(selectedInterface.c_str(), getDefaultMac());
+		setMac(selectedInterface.c_str(), defaultMac);
 		sleep(1);
 
 		allowArp(selectedInterface.c_str());
@@ -624,7 +627,8 @@ int main(int argc, char* argv[]){
 		removeDirectories();
 		sleep(1);
 
-		notify("Duppy has stopped!");
+		notify("Stopped\nMAC: " + defaultMac + "\nHostname: " + defaultHostname);
+		sleep(1);
 
 	} else {
 
