@@ -511,6 +511,13 @@ void notify(std::string text){
 	}
 }
 
+void printHelp(){
+
+	std::cout << "Usage: ./duppy stop|start <interface> \n" << std::endl;
+	exit(1);
+
+}
+
 int main(int argc, char* argv[]){
 
 	std::cout << "\n";
@@ -524,10 +531,9 @@ int main(int argc, char* argv[]){
 	sleep(1);
 
 	//Solve the "Segmentation fault" error if no arg
-	if (argc != 3){
+	if ((argc != 3) || (argc != 4)){
 
-		std::cout << "Usage: ./duppy stop|start <interface> \n" << std::endl;
-		exit(1);
+		printHelp();
 
 	}
 
@@ -536,7 +542,7 @@ int main(int argc, char* argv[]){
 
 
 		std::string selectedInterface = checkInterface(argv[2]);
-		sleep(1);
+
 
 		createDiretories();
 		sleep(1);
@@ -632,7 +638,7 @@ int main(int argc, char* argv[]){
 
 	} else {
 
-		std::cout << "\nUsage: ./duppy stop|start <interface> " << std::endl;
+		printHelp();
 
 	}
 }
