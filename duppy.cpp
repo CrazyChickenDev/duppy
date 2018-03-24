@@ -50,7 +50,7 @@ void stopNetworkManager(){
 
 		int statusCode;
 
-		std::cout << "Stop network-manager: ";
+		std::cout << "Stop network-manager: \t\t";
 
 		if ((statusCode = std::system("service network-manager stop")) == 0){
 
@@ -68,7 +68,7 @@ void startNetworkManager(){
 
 		int statusCode;
 
-		std::cout << "Start network-manager: ";
+		std::cout << "Start network-manager: \t\t";
 
 		if ((statusCode = std::system("service network-manager start")) == 0){
 
@@ -81,14 +81,13 @@ void startNetworkManager(){
 		}
 }
 
-void ifconfigDown(const char *interfaceName){
+void ifconfigDown(std::string interfaceName){
 
 		int statusCode;
-		std::string command = "ifconfig ";
-		command.append(interfaceName);
-		command.append(" down");
+		std::string command = "ifconfig " + interfaceName + " down";
 
-		std::cout << "Interface " << interfaceName << " set down: ";
+
+		std::cout << "Interface " << interfaceName << " set down: \t";
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
@@ -102,15 +101,13 @@ void ifconfigDown(const char *interfaceName){
 		}
 }
 
-void ifconfigUp(const char *interfaceName){
+void ifconfigUp(std::string interfaceName){
 
 		int statusCode;
+		std::string command = "ifconfig " + interfaceName + " up";
 
-		std::string command = "ifconfig ";
-		command.append(interfaceName);
-		command.append(" up");
 
-		std::cout << "Interface " << interfaceName << " set up: ";
+		std::cout << "Interface " << interfaceName << " set up: \t";
 
 		if ((statusCode = std::system(command.c_str())) == 0){
 
@@ -123,15 +120,15 @@ void ifconfigUp(const char *interfaceName){
 		}
 }
 
-std::string checkInterface(const char *interface){
+std::string checkInterface(std::string interfaceName){
 
-		std::string line, e;
+		std::string line, full;
 		std::ifstream myfile ("/proc/net/dev");
 
 		if (myfile.is_open()){
 
 			while ( getline (myfile,line) ){
-				e += line;
+				full += line;
 			}
 			myfile.close();
 		} else {
@@ -142,15 +139,14 @@ std::string checkInterface(const char *interface){
 		}
 
 
-		std::size_t found = e.find(interface);
-		if (found == std::string::npos){
+		if (full.find(interfaceName) == std::string::npos){
 
-			std::cout << "Not a valid interface: " << interface << std::endl;
+			std::cout << "Not a valid interface: " << interfaceName << std::endl;
 			std::cout << "Check \"iwconfig\" !\n" << std::endl;
 			std::exit(1);
 		}
 
-		return interface;
+		return interfaceName;
 }
 
 int randomNumber(double min, double max){
@@ -166,32 +162,18 @@ int randomNumber(double min, double max){
 		return num;
 }
 
-void setRandomHostname(){
+std::string getRandomHostname(){
 
-		int statusCode;
-		std::string hostname;
-		std::string command = "hostnamectl set-hostname ";
+		std::string RandomHostname;
+
 
 		for (int i = 0; i < 10; i++){
 
-			hostname += 'a' + randomNumber(0.0, 26.0);
+			RandomHostname += 'a' + randomNumber(0.0, 26.0);
 
 		}
 
-		command.append(hostname);
-
-		std::cout << "Hostname change: ";
-
-		if ((statusCode = system(command.c_str())) == 0){
-
-			std::cout << "\e[32mSUCCESS!\e[0m";
-			std::cout << "(New hostname: " << hostname << ")" << std::endl;
-
-		} else {
-
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
-
-		}
+		return RandomHostname;
 }
 
 void saveDefaultHostname(){
@@ -200,7 +182,7 @@ void saveDefaultHostname(){
 		std::string defaultHostname;
 		std::string command = "hostname > /tmp/duppy/hostname";
 
-		std::cout << "Save default hostname: ";
+		std::cout << "Save default hostname: \t\t";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
@@ -214,12 +196,11 @@ void saveDefaultHostname(){
 		}
 }
 
-void restoreDefaultHostname(){
+std::string getDefaultHostname(){
 
 		std::ifstream myfile ("/tmp/duppy/hostname");
 		std::string defaultHostname;
-		std::string command = "hostnamectl set-hostname ";
-		int statusNumber;
+
 
 		if (myfile.is_open()){
 
@@ -232,29 +213,36 @@ void restoreDefaultHostname(){
 
 		}
 
-		command += defaultHostname;
-
-		std::cout << "Hostname set to default: ";
-
-		if ((statusNumber = system(command.c_str())) == 0){
-
-			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
-
-		} else {
-
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
-
-		}
+		return defaultHostname;
 }
 
-void saveDefaultMac(const char *interface){
+void setHostname(std::string hostname){
+
+	int statusCode;
+	std::string command = "hostnamectl set-hostname " + hostname;
+
+	std::cout << "Set hostname to \"" << hostname << "\":\t";
+
+	if ((statusCode = system(command.c_str())) == 0 ){
+
+		std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+	} else {
+
+		std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+
+}
+
+void saveDefaultMac(std::string interface){
 
 		int statusCode;
-		std::string command = "cat /sys/class/net/";
-		command.append(interface);
-		command.append("/address > /tmp/duppy/defaultmac");
+		std::string command = "cat /sys/class/net/" + interface + "/address > /tmp/duppy/defaultmac";
 
-		std::cout << "Save default mac address: ";
+
+		std::cout << "Save default mac address: \t";
 
 		if ((statusCode = system(command.c_str())) == 0 ){
 
@@ -267,14 +255,10 @@ void saveDefaultMac(const char *interface){
 		}
 }
 
-void restoreDefaultMac(const char *interface){
+std::string getDefaultMac(){
 
-		int statusNumber;
 		std::ifstream myfile ("/tmp/duppy/defaultmac");
 		std::string defaultMac;
-		std::string command = "ifconfig ";
-		command.append(interface);
-		command.append(" hw ether ");
 
 
 		if (myfile.is_open()){
@@ -288,9 +272,17 @@ void restoreDefaultMac(const char *interface){
 
 		}
 
-		command += defaultMac;
+		return defaultMac;
 
-		std::cout << "Mac address set to default: ";
+
+}
+
+void setMac(std::string interface, std::string mac){
+
+		int statusNumber;
+		std::string command = "ifconfig " + interface + " hw ether " + mac;
+
+		std::cout << "Mac address set to \"" + mac + "\": \t";
 
 		if ((statusNumber = system(command.c_str())) == 0){
 
@@ -346,7 +338,7 @@ void ignoreArp(const char *interface){
 		commandIgnore.append(interface);
 		commandIgnore.append(".arp_ignore=8");
 
-		std::cout << "Ignoring ARP: ";
+		std::cout << "Ignoring ARP: \t\t\t";
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
@@ -366,7 +358,7 @@ void restrictArpAnnounce(const char *interface){
 		commandAnnounce.append(interface);
 		commandAnnounce.append(".arp_announce=2");
 
-		std::cout << "Restrict ARP announce: ";
+		std::cout << "Restrict ARP announce: \t\t";
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
@@ -379,9 +371,6 @@ void restrictArpAnnounce(const char *interface){
 		}
 }
 
-
-
-
 void allowArp(const char *interface){
 
 		int statusCode;
@@ -389,7 +378,7 @@ void allowArp(const char *interface){
 		commandIgnore.append(interface);
 		commandIgnore.append(".arp_ignore=0");
 
-		std::cout << "Enable ARP: ";
+		std::cout << "Enable ARP: \t\t\t";
 
 		if ((statusCode = system(commandIgnore.c_str())) == 0){
 
@@ -409,7 +398,7 @@ void enableArpAnnounce(const char *interface){
 		commandAnnounce.append(interface);
 		commandAnnounce.append(".arp_announce=0");
 
-		std::cout << "Enable ARP announce: ";
+		std::cout << "Enable ARP announce: \t\t";
 
 		if ((statusCode = system(commandAnnounce.c_str())) == 0){
 
@@ -428,12 +417,11 @@ void disableICMP(){
 		int statusCode;
 		std::string command = "sysctl -q -w net.ipv4.icmp_echo_ignore_all=1";
 
-		std::cout << "Disable ping response: ";
+		std::cout << "Disable ping response: \t\t";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
-			std::cout << "\e[32mSUCCESS!\e[0m";
-			std::cout << " (WARNING!!!! This affect every interface!)" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
 		} else {
 
@@ -447,7 +435,7 @@ void enableICMP(){
 		int statusCode;
 		std::string command = "sysctl -q -w net.ipv4.icmp_echo_ignore_all=0";
 
-		std::cout << "Enable ping response: ";
+		std::cout << "Enable ping response: \t\t";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
@@ -465,7 +453,7 @@ void removeKnownAP(){
 		int statusCode;
 		std::string command = "mv -f /etc/NetworkManager/system-connections/* /tmp/duppy/known_ap/";
 
-		std::cout << "Temporary remove known APs: ";
+		std::cout << "Temporary remove known APs: \t";
 
 		if ((statusCode = system(command.c_str())) == 0){
 
@@ -484,7 +472,7 @@ void setBackKnownAP(){
 		std::string commandMove = "mv -f /tmp/duppy/known_ap/* /etc/NetworkManager/system-connections/";
 		std::string commandRm = "rm -f /etc/NetworkManager/system-connections/*";
 
-		std::cout << "Remove the used AP: ";
+		std::cout << "Remove the used AP: \t\t";
 
 		if ((statusCode = system(commandRm.c_str())) == 0){
 
@@ -498,7 +486,7 @@ void setBackKnownAP(){
 
 		sleep(1);
 
-		std::cout << "Set back known APs: ";
+		std::cout << "Set back known APs: \t\t";
 
 		if ((statusCode = system(commandMove.c_str())) == 0){
 
@@ -569,7 +557,7 @@ int main(int argc, char* argv[]){
 		setDuppyNetworkRandom();
 		sleep(1);
 
-		setRandomHostname();
+		setHostname(getRandomHostname());
 		sleep(1);
 
 		ignoreArp(selectedInterface.c_str());
@@ -606,13 +594,13 @@ int main(int argc, char* argv[]){
 		ifconfigDown(selectedInterface.c_str());
 		sleep(1);
 
-		restoreDefaultHostname();
+		setHostname(getDefaultHostname());
 		sleep(1);
 
 		deleteDuppynetworkRandom();
 		sleep(1);
 
-		restoreDefaultMac(selectedInterface.c_str());
+		setMac(selectedInterface.c_str(), getDefaultMac());
 		sleep(1);
 
 		allowArp(selectedInterface.c_str());
