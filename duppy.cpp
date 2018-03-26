@@ -313,6 +313,24 @@ void setDuppyNetworkRandom(){
 		}
 }
 
+void setDuppyNetworkPreserve(){
+
+		int statusCode;
+		std::string command = "cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/";
+
+		std::cout << "Insert duppynetworkRandom.conf: ";
+
+		if ((statusCode = system(command.c_str())) == 0){
+
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+		} else {
+
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+}
+
 void deleteDuppynetworkRandom(){
 
 		int statusCode;
@@ -331,12 +349,29 @@ void deleteDuppynetworkRandom(){
 		}
 }
 
-void ignoreArp(const char *interface){
+void deleteDuppynetworkPreserve(){
 
 		int statusCode;
-		std::string commandIgnore = "sysctl -q -w net.ipv4.conf.";
-		commandIgnore.append(interface);
-		commandIgnore.append(".arp_ignore=8");
+		std::string command = "rm -f /etc/NetworkManager/conf.d/duppynetworkPreserve.conf";
+
+		std::cout << "Remove duppynetworkRandom.conf: ";
+
+		if ((statusCode = system(command.c_str())) == 0){
+
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+		} else {
+
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+}
+
+void ignoreArp(std::string interface){
+
+		int statusCode;
+		std::string commandIgnore = "sysctl -q -w net.ipv4.conf." + interface + ".arp_ignore=8";
+
 
 		std::cout << "Ignoring ARP: \t\t\t";
 
@@ -351,12 +386,11 @@ void ignoreArp(const char *interface){
 		}
 }
 
-void restrictArpAnnounce(const char *interface){
+void restrictArpAnnounce(std::string interface){
 
 		int statusCode;
-		std::string commandAnnounce = "sysctl -q -w net.ipv4.conf.";
-		commandAnnounce.append(interface);
-		commandAnnounce.append(".arp_announce=2");
+		std::string commandAnnounce = "sysctl -q -w net.ipv4.conf." + interface + ".arp_announce=2";
+
 
 		std::cout << "Restrict ARP announce: \t\t";
 
@@ -371,12 +405,11 @@ void restrictArpAnnounce(const char *interface){
 		}
 }
 
-void allowArp(const char *interface){
+void allowArp(std::string interface){
 
 		int statusCode;
-		std::string commandIgnore = "sysctl -q -w net.ipv4.conf.";
-		commandIgnore.append(interface);
-		commandIgnore.append(".arp_ignore=0");
+		std::string commandIgnore = "sysctl -q -w net.ipv4.conf." + interface + ".arp_ignore=0";
+
 
 		std::cout << "Enable ARP: \t\t\t";
 
@@ -391,12 +424,11 @@ void allowArp(const char *interface){
 		}
 }
 
-void enableArpAnnounce(const char *interface){
+void enableArpAnnounce(std::string interface){
 
 		int statusCode;
-		std::string commandAnnounce = "sysctl -q -w net.ipv4.conf.";
-		commandAnnounce.append(interface);
-		commandAnnounce.append(".arp_announce=0");
+		std::string commandAnnounce = "sysctl -q -w net.ipv4.conf." + interface + ".arp_announce=0";
+		
 
 		std::cout << "Enable ARP announce: \t\t";
 
