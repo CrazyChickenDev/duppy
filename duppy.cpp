@@ -531,7 +531,7 @@ int main(int argc, char* argv[]){
 	sleep(1);
 
 	//Solve the "Segmentation fault" error if no arg
-	if ((argc != 3) || (argc != 4)){
+	if (argc != 3){
 
 		printHelp();
 
