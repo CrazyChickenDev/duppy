@@ -10,8 +10,12 @@ void checkRoot(){
 
 		if (geteuid() != 0){
 
-			std::cout << "Run as root!\n" << std::endl;;
+			std::cout << "\n\tRun as ROOT!\n" << std::endl;;
 			std:: exit(1);
+
+		} else {
+
+			std::cout << "\n";
 
 		}
 }
@@ -138,7 +142,6 @@ std::string checkInterface(std::string interfaceName){
 
 		}
 
-
 		if (full.find(interfaceName) == std::string::npos){
 
 			std::cout << "Not a valid interface: " << interfaceName << std::endl;
@@ -180,7 +183,7 @@ void saveDefaultHostname(){
 
 		int statusCode;
 		std::string defaultHostname;
-		std::string command = "hostname > /tmp/duppy/hostname";
+		std::string command = "hostname > /tmp/duppy/defaulthostname";
 
 		std::cout << "Save default hostname: \t\t";
 
@@ -198,7 +201,7 @@ void saveDefaultHostname(){
 
 std::string getDefaultHostname(){
 
-		std::ifstream myfile ("/tmp/duppy/hostname");
+		std::ifstream myfile ("/tmp/duppy/defaulthostname");
 		std::string defaultHostname;
 
 
@@ -209,11 +212,49 @@ std::string getDefaultHostname(){
 
 		} else {
 
-			std::cout << "Open /tmp/duppy/hostname: \e[31mFAILED!\e[0m" << std::endl;;
+			std::cout << "Open /tmp/duppy/defaulthostname: \e[31mFAILED!\e[0m" << std::endl;;
 
 		}
 
 		return defaultHostname;
+}
+
+std::string getActualHostname(){
+
+		int statuscode;
+		std::string actualhostname;
+		std::string commandWrite = "hostname > /tmp/actualhostname";
+		std::string commandRemove = "rm -f /tmp/actualhostname";
+
+
+		if ((statuscode = system(commandWrite.c_str())) != 0 ){
+
+			std::cout << "Save the actual hostname: \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
+
+		}
+
+		//If dont declare here myfile, the open fail
+		std::ifstream myfile ("/tmp/actualhostname");
+
+		if (myfile.is_open()) {
+
+			getline(myfile, actualhostname);
+
+		} else {
+
+			std::cout << "Open \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
+
+		}
+
+		if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+
+			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+		return actualhostname;
 }
 
 void setHostname(std::string hostname){
@@ -232,8 +273,6 @@ void setHostname(std::string hostname){
 		std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 	}
-
-
 }
 
 void saveDefaultMac(std::string interface){
@@ -273,8 +312,44 @@ std::string getDefaultMac(){
 		}
 
 		return defaultMac;
+}
+
+std::string getActualMac(std::string interface){
+
+		int statuscode;
+		std::string actualmac;
+		std::string commandWrite = "cat /sys/class/net/" + interface + "/address > /tmp/actualmac";
+		std::string commandRemove = "rm -f /tmp/actualmac";
+
+		if ((statuscode = system(commandWrite.c_str())) != 0 ){
+
+			std::cout << "Save the actual mac: \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
+
+		}
+
+		//If dont declare here myfile, the open fail
+		std::ifstream myfile ("/tmp/actualmac");
 
 
+		if (myfile.is_open()) {
+
+			getline(myfile, actualmac);
+
+		} else {
+
+			std::cout << "Open \"/tmp/actualmac\": \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
+
+		}
+
+		if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+
+			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+		return actualmac;
 }
 
 void setMac(std::string interface, std::string mac){
@@ -428,7 +503,7 @@ void enableArpAnnounce(std::string interface){
 
 		int statusCode;
 		std::string commandAnnounce = "sysctl -q -w net.ipv4.conf." + interface + ".arp_announce=0";
-		
+
 
 		std::cout << "Enable ARP announce: \t\t";
 
@@ -533,48 +608,74 @@ void setBackKnownAP(){
 
 void notify(std::string text){
 
-	int statusCode;
-	std::string command = "/usr/bin/notify-send \"Duppy\" \"" + text + "\"";
+		int statusCode;
+		std::string command = "/usr/bin/notify-send \"Duppy\" \"" + text + "\"";
 
-	if ((statusCode = system(command.c_str())) != 0) {
+		if ((statusCode = system(command.c_str())) != 0) {
 
-		std::cout << text << std::endl;
+			std::cout << text << std::endl;
 
-	}
+		}
 }
 
 void printHelp(){
 
-	std::cout << "Usage: ./duppy stop|start <interface> \n" << std::endl;
-	exit(1);
+		std::cout << "Usage: ./duppy stop|start <interface> \n" << std::endl;
+		exit(1);
 
+}
+
+std::string checkDuppyStatus(){
+
+		std::ifstream myfile ("/tmp/duppy/defaulthostname");
+
+
+		if (myfile.is_open()){
+
+			return "enabled";
+
+		} else {
+
+			return "disabled";
+
+		}
 }
 
 int main(int argc, char* argv[]){
 
-	std::cout << "\n";
 
 	std::string start = "start";
 	std::string stop = "stop";
+	std::string check = "check";
 	std::string initCommand;
+	std::string selectedInterface;
+	std::string selectedMac;
 
-	//check user id
 	checkRoot();
 	sleep(1);
 
 	//Solve the "Segmentation fault" error if no arg
-	if (argc != 3){
+	if (argc == 3){
+
+		initCommand = argv[1];
+		selectedInterface = checkInterface(argv[2]);
+
+	} else if (argc == 4) {
+
+		initCommand = argv[1];
+		selectedMac = argv[2];
+		selectedInterface = checkInterface(argv[3]);
+
+	} else {
 
 		printHelp();
 
 	}
 
-	//start Duppy
-	if ((initCommand = argv[1]) == start.c_str()){
 
+	if (initCommand == start.c_str()){
 
-		std::string selectedInterface = checkInterface(argv[2]);
-
+		//start Duppy
 
 		createDiretories();
 		sleep(1);
@@ -621,11 +722,10 @@ int main(int argc, char* argv[]){
 		notify("Dont worry about the 'sudo: unable to resolve host...' error");
 		sleep(1);
 
-	} else if ((initCommand = argv[1]) == stop.c_str()){
+	} else if (initCommand  == stop.c_str()){
 
 		//stop duppy
 
-		std::string selectedInterface = checkInterface(argv[2]);
 		std::string defaultMac = getDefaultMac();
 		std::string defaultHostname = getDefaultHostname();
 
@@ -666,6 +766,19 @@ int main(int argc, char* argv[]){
 		sleep(1);
 
 		notify("Stopped\nMAC: " + defaultMac + "\nHostname: " + defaultHostname);
+		sleep(1);
+
+	} else if (initCommand == check.c_str()){
+
+		//check
+
+		std::cout << "Duppy is " << checkDuppyStatus() << std::endl;
+		sleep(1);
+
+		std::cout << "Actual hostname: " << getActualHostname() << std::endl;
+		sleep(1);
+
+		std::cout << "Actual mac: " << getActualMac(selectedInterface) << std::endl;
 		sleep(1);
 
 	} else {
