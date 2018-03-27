@@ -632,11 +632,11 @@ std::string checkDuppyStatus(){
 
 		if (myfile.is_open()){
 
-			return "enabled";
+			return "\e[32mENABLED\e[0m";
 
 		} else {
 
-			return "disabled";
+			return "\e[31mDISABLED\e[0m";
 
 		}
 }
@@ -772,13 +772,13 @@ int main(int argc, char* argv[]){
 
 		//check
 
-		std::cout << "Duppy is " << checkDuppyStatus() << std::endl;
+		std::cout << "Duppy:\t\t" << checkDuppyStatus() << std::endl;
 		sleep(1);
 
-		std::cout << "Actual hostname: " << getActualHostname() << std::endl;
+		std::cout << "Hostname:\t" << getActualHostname() << std::endl;
 		sleep(1);
 
-		std::cout << "Actual mac: " << getActualMac(selectedInterface) << std::endl;
+		std::cout << "Mac:\t\t" << getActualMac(selectedInterface) << std::endl;
 		sleep(1);
 
 	} else {
