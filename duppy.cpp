@@ -257,14 +257,62 @@ std::string getActualHostname(){
 		return actualhostname;
 }
 
-void setHostname(std::string hostname){
+void setHostname(std::string hostname, std::string initCommand){
 
-	int statusCode;
-	std::string command = "hostnamectl set-hostname " + hostname;
+	int statuscodeKernelHostname;
+	int statuscodeEtcHostname;
+	int statuscodeHosts;
+	int statuscodeXauth;
 
+
+	std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
+	std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
+	std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
+	std::string commandXauthAdd = "su -c \"xauth add $(xauth list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+	std::string commandXauthRemove = "su -c \"xauth remove $(xauth list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+
+
+	if ((statuscodeKernelHostname =  system(commandKernelHostname.c_str())) != 0 ){
+
+		std::cout << "Write to /proc/sys/kernel/hostname: \e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+	if ((statuscodeEtcHostname =  system(commandEtcHostname.c_str())) != 0 ){
+
+		std::cout << "Write /etc/hostname: \t\e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+	if ((statuscodeHosts =  system(commandHosts.c_str())) != 0 ){
+
+		std::cout << "Write to /etc/hosts: \t\e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+	//switch from start/stop
+
+	if (initCommand == "start"){
+
+		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
+
+			std::cout << "Add Xauth entry: \t\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+	} else if (initCommand == "stop") {
+
+		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
+
+			std::cout << "Remove Xauth entry: \t\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+	}
+
+	int changeResult = statuscodeKernelHostname + statuscodeEtcHostname + statuscodeHosts + statuscodeXauth;
 	std::cout << "Set hostname to \"" << hostname << "\":\t";
 
-	if ((statusCode = system(command.c_str())) == 0 ){
+	if (changeResult == 0) {
 
 		std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -673,7 +721,7 @@ int main(int argc, char* argv[]){
 	}
 
 
-	if (initCommand == start.c_str()){
+	if (initCommand == "start" ){
 
 		//start Duppy
 
@@ -695,7 +743,7 @@ int main(int argc, char* argv[]){
 		setDuppyNetworkRandom();
 		sleep(1);
 
-		setHostname(getRandomHostname());
+		setHostname(getRandomHostname(), initCommand);
 		sleep(1);
 
 		ignoreArp(selectedInterface.c_str());
@@ -722,7 +770,7 @@ int main(int argc, char* argv[]){
 		notify("Dont worry about the 'sudo: unable to resolve host...' error");
 		sleep(1);
 
-	} else if (initCommand  == stop.c_str()){
+	} else if (initCommand  == "stop" ){
 
 		//stop duppy
 
@@ -735,7 +783,7 @@ int main(int argc, char* argv[]){
 		ifconfigDown(selectedInterface.c_str());
 		sleep(1);
 
-		setHostname(defaultHostname);
+		setHostname(defaultHostname, initCommand);
 		sleep(1);
 
 		deleteDuppynetworkRandom();
@@ -768,7 +816,7 @@ int main(int argc, char* argv[]){
 		notify("Stopped\nMAC: " + defaultMac + "\nHostname: " + defaultHostname);
 		sleep(1);
 
-	} else if (initCommand == check.c_str()){
+	} else if (initCommand == "check" ){
 
 		//check
 
