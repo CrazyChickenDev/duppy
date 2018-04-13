@@ -268,9 +268,27 @@ void setHostname(std::string hostname, std::string initCommand){
 	std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
 	std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
 	std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
-	std::string commandXauthAdd = "su -c \"xauth add $(xauth list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
-	std::string commandXauthRemove = "su -c \"xauth remove $(xauth list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+	std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+	std::string commandXauthRemove = "xauth remove " + getActualHostname() + "/unix:0";
 
+	//switch from start/stop
+
+	if (initCommand == "start"){
+
+		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
+
+			std::cout << "Add Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+	} else if (initCommand == "stop") {
+
+		if ((statuscodeXauth =  system(commandXauthRemove.c_str())) != 0 ){
+
+			std::cout << "Remove Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+
+		}
+	}
 
 	if ((statuscodeKernelHostname =  system(commandKernelHostname.c_str())) != 0 ){
 
@@ -290,24 +308,6 @@ void setHostname(std::string hostname, std::string initCommand){
 
 	}
 
-	//switch from start/stop
-
-	if (initCommand == "start"){
-
-		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
-
-			std::cout << "Add Xauth entry: \t\e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-	} else if (initCommand == "stop") {
-
-		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
-
-			std::cout << "Remove Xauth entry: \t\e[31mFAILED!\e[0m" << std::endl;
-
-		}
-	}
 
 	int changeResult = statuscodeKernelHostname + statuscodeEtcHostname + statuscodeHosts + statuscodeXauth;
 	std::cout << "Set hostname to \"" << hostname << "\":\t";
