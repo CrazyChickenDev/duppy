@@ -668,7 +668,9 @@ void notify(std::string text){
 
 void printHelp(){
 
-		std::cout << "Usage: ./duppy stop|start <interface> \n" << std::endl;
+		std::cout << "                start" << std::endl;
+		std::cout << "Usage: ./duppy  stop   <interface>" << std::endl;
+		std::cout << "                check\n" << std::endl;
 		exit(1);
 
 }
