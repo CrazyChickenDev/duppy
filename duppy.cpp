@@ -50,6 +50,133 @@ void removeDirectories(){
 		}
 }
 
+std::string getUser(){
+
+	int statuscode;
+	std::string user;
+	std::string commandWrite = "ls /home/ > /tmp/duppy/user";
+	std::string commandRemove = "rm -f /tmp/duppy/user";
+
+
+	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+
+		std::cout << "Save user: \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	//If dont declare here myfile, the open fail
+	std::ifstream myfile ("/tmp/duppy/user");
+
+	if (myfile.is_open()) {
+
+		getline(myfile, user);
+
+	} else {
+
+		std::cout << "Open \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+
+		std::cout << "Remove \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+	return user;
+
+}
+
+std::string getHomeFolder() {
+
+    std::string folder = "/home/" + getUser();
+
+    return folder;
+}
+
+int getUID(){
+
+
+
+	int statuscode;
+	std::string userid;
+	std::string commandWrite = "id -u " + getUser() + "> /tmp/duppy/userid";
+	std::string commandRemove = "rm -f /tmp/duppy/userid";
+
+
+	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+
+		std::cout << "Save user id: \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	//If dont declare here myfile, the open fail
+	std::ifstream myfile ("/tmp/duppy/userid");
+
+	if (myfile.is_open()) {
+
+		getline(myfile, userid);
+
+	} else {
+
+		std::cout << "Open \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+
+		std::cout << "Remove \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+
+	return std::stoi(userid);
+}
+
+int getGID(){
+
+
+
+	int statuscode;
+	std::string groupid;
+	std::string commandWrite = "id -g " + getUser() + "> /tmp/duppy/groupid";
+	std::string commandRemove = "rm -f /tmp/duppy/groupid";
+
+
+	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+
+		std::cout << "Save group id: \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	//If dont declare here myfile, the open fail
+	std::ifstream myfile ("/tmp/duppy/groupid");
+
+	if (myfile.is_open()) {
+
+		getline(myfile, groupid);
+
+	} else {
+
+		std::cout << "Open \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
+		std::exit(1);
+
+	}
+
+	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+
+		std::cout << "Remove \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
+
+	}
+
+	return std::stoi(groupid);
+}
+
 void stopNetworkManager(){
 
 		int statusCode;
@@ -321,6 +448,31 @@ void setHostname(std::string hostname, std::string initCommand){
 		std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
 	}
+}
+
+void authChown(){
+
+		int statuscodeChownX;
+		int statuscodeChownICE;
+
+		std::string folderX = getHomeFolder() + "/.Xauthority";
+		std::string folderICE =getHomeFolder() + "/.ICEauthority";
+
+		uid_t uid = getUID();
+		gid_t gid = getGID();
+
+		if ((statuscodeChownX = chown(folderX.c_str(), uid, gid)) != 0){
+
+			std::cout << "Change owner to Xauth: \e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+		if ((statuscodeChownICE = chown(folderICE.c_str(), uid, gid)) != 0){
+
+			std::cout << "Change owner to ICEauth: \e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
 }
 
 void saveDefaultMac(std::string interface){
@@ -810,6 +962,9 @@ int main(int argc, char* argv[]){
 		sleep(1);
 
 		startNetworkManager();
+		sleep(1);
+
+		authChown();
 		sleep(1);
 
 		removeDirectories();
