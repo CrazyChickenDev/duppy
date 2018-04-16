@@ -921,8 +921,6 @@ int main(int argc, char* argv[]){
 		notify("Started");
 		sleep(1);
 
-		notify("Dont worry about the 'sudo: unable to resolve host...' error");
-		sleep(1);
 
 	} else if (initCommand  == "stop" ){
 
