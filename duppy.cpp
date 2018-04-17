@@ -54,39 +54,35 @@ std::string getUser(){
 
 	int statuscode;
 	std::string user;
-	std::string commandWrite = "ls /home/ > /tmp/duppy/user";
-	std::string commandRemove = "rm -f /tmp/duppy/user";
 
-
-	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+	if ((statuscode = system("ls /home/ > /tmp/duppy/user")) != 0 ){
 
 		std::cout << "Save user: \e[31mFAILED!\e[0m" << std::endl;
 		std::exit(1);
 
 	}
 
-	//If dont declare here myfile, the open fail
-	std::ifstream myfile ("/tmp/duppy/user");
+		//If dont declare here myfile, the open fail
+		std::ifstream myfile ("/tmp/duppy/user");
 
-	if (myfile.is_open()) {
+		if (myfile.is_open()) {
 
-		getline(myfile, user);
+			getline(myfile, user);
 
-	} else {
+		} else {
 
-		std::cout << "Open \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+			std::cout << "Open \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
-	}
+		}
 
-	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+		if ((statuscode =  system("rm -f /tmp/duppy/user")) != 0 ){
 
-		std::cout << "Remove \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
+			std::cout << "Remove \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
 
-	}
+		}
 
-	return user;
-
+		return user;
 }
 
 std::string getHomeFolder() {
@@ -98,83 +94,74 @@ std::string getHomeFolder() {
 
 int getUID(){
 
+		int statuscode;
+		std::string userid;
+		std::string commandWrite = "id -u " + getUser() + "> /tmp/duppy/userid";
 
+		if ((statuscode = system(commandWrite.c_str())) != 0 ){
 
-	int statuscode;
-	std::string userid;
-	std::string commandWrite = "id -u " + getUser() + "> /tmp/duppy/userid";
-	std::string commandRemove = "rm -f /tmp/duppy/userid";
+			std::cout << "Save user id: \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
+		}
 
-	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+		//If dont declare here myfile, the open fail
+		std::ifstream myfile ("/tmp/duppy/userid");
 
-		std::cout << "Save user id: \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+		if (myfile.is_open()) {
 
-	}
+			getline(myfile, userid);
 
-	//If dont declare here myfile, the open fail
-	std::ifstream myfile ("/tmp/duppy/userid");
+		} else {
 
-	if (myfile.is_open()) {
+			std::cout << "Open \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
-		getline(myfile, userid);
+		}
 
-	} else {
+		if ((statuscode =  system("rm -f /tmp/duppy/userid")) != 0 ){
 
-		std::cout << "Open \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+			std::cout << "Remove \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
 
-	}
+		}
 
-	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
-
-		std::cout << "Remove \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
-
-	}
-
-
-	return std::stoi(userid);
+		return std::stoi(userid);
 }
 
 int getGID(){
 
+		int statuscode;
+		std::string groupid;
+		std::string commandWrite = "id -g " + getUser() + "> /tmp/duppy/groupid";
 
+		if ((statuscode = system(commandWrite.c_str())) != 0 ){
 
-	int statuscode;
-	std::string groupid;
-	std::string commandWrite = "id -g " + getUser() + "> /tmp/duppy/groupid";
-	std::string commandRemove = "rm -f /tmp/duppy/groupid";
+			std::cout << "Save group id: \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
+		}
 
-	if ((statuscode = system(commandWrite.c_str())) != 0 ){
+		//If dont declare here myfile, the open fail
+		std::ifstream myfile ("/tmp/duppy/groupid");
 
-		std::cout << "Save group id: \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+		if (myfile.is_open()) {
 
-	}
+			getline(myfile, groupid);
 
-	//If dont declare here myfile, the open fail
-	std::ifstream myfile ("/tmp/duppy/groupid");
+		} else {
 
-	if (myfile.is_open()) {
+			std::cout << "Open \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
-		getline(myfile, groupid);
+		}
 
-	} else {
+		if ((statuscode =  system("rm -f /tmp/duppy/groupid")) != 0 ){
 
-		std::cout << "Open \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+			std::cout << "Remove \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
 
-	}
+		}
 
-	if ((statuscode =  system(commandRemove.c_str())) != 0 ){
-
-		std::cout << "Remove \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
-
-	}
-
-	return std::stoi(groupid);
+		return std::stoi(groupid);
 }
 
 void stopNetworkManager(){
@@ -216,7 +203,6 @@ void ifconfigDown(std::string interfaceName){
 
 		int statusCode;
 		std::string command = "ifconfig " + interfaceName + " down";
-
 
 		std::cout << "Interface " << interfaceName << " set down: \t";
 
@@ -296,7 +282,6 @@ std::string getRandomHostname(){
 
 		std::string RandomHostname;
 
-
 		for (int i = 0; i < 10; i++){
 
 			RandomHostname += 'a' + randomNumber(0.0, 26.0);
@@ -310,11 +295,10 @@ void saveDefaultHostname(){
 
 		int statusCode;
 		std::string defaultHostname;
-		std::string command = "hostname > /tmp/duppy/defaulthostname";
 
 		std::cout << "Save default hostname: \t\t";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("hostname > /tmp/duppy/defaulthostname")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -330,7 +314,6 @@ std::string getDefaultHostname(){
 
 		std::ifstream myfile ("/tmp/duppy/defaulthostname");
 		std::string defaultHostname;
-
 
 		if (myfile.is_open()){
 
@@ -350,11 +333,8 @@ std::string getActualHostname(){
 
 		int statuscode;
 		std::string actualhostname;
-		std::string commandWrite = "hostname > /tmp/actualhostname";
-		std::string commandRemove = "rm -f /tmp/actualhostname";
 
-
-		if ((statuscode = system(commandWrite.c_str())) != 0 ){
+		if ((statuscode = system("hostname > /tmp/actualhostname")) != 0 ){
 
 			std::cout << "Save the actual hostname: \e[31mFAILED!\e[0m" << std::endl;
 			std::exit(1);
@@ -375,7 +355,7 @@ std::string getActualHostname(){
 
 		}
 
-		if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+		if ((statuscode =  system("rm -f /tmp/actualhostname")) != 0 ){
 
 			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
 
@@ -386,68 +366,68 @@ std::string getActualHostname(){
 
 void setHostname(std::string hostname, std::string initCommand){
 
-	int statuscodeKernelHostname;
-	int statuscodeEtcHostname;
-	int statuscodeHosts;
-	int statuscodeXauth;
+		int statuscodeKernelHostname;
+		int statuscodeEtcHostname;
+		int statuscodeHosts;
+		int statuscodeXauth;
 
 
-	std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
-	std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
-	std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
-	std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
-	std::string commandXauthRemove = "xauth remove " + getActualHostname() + "/unix:0";
+		std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
+		std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
+		std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
+		std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+		std::string commandXauthRemove = "xauth remove " + getActualHostname() + "/unix:0";
 
-	//switch from start/stop
+		//switch from start/stop
 
-	if (initCommand == "start"){
+		if (initCommand == "start"){
 
-		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
+			if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
 
-			std::cout << "Add Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+				std::cout << "Add Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+
+			}
+
+		} else if (initCommand == "stop") {
+
+			if ((statuscodeXauth =  system(commandXauthRemove.c_str())) != 0 ){
+
+				std::cout << "Remove Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+
+			}
+		}
+
+		if ((statuscodeKernelHostname =  system(commandKernelHostname.c_str())) != 0 ){
+
+			std::cout << "Write to /proc/sys/kernel/hostname: \e[31mFAILED!\e[0m" << std::endl;
 
 		}
 
-	} else if (initCommand == "stop") {
+		if ((statuscodeEtcHostname =  system(commandEtcHostname.c_str())) != 0 ){
 
-		if ((statuscodeXauth =  system(commandXauthRemove.c_str())) != 0 ){
-
-			std::cout << "Remove Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+			std::cout << "Write /etc/hostname: \t\e[31mFAILED!\e[0m" << std::endl;
 
 		}
-	}
 
-	if ((statuscodeKernelHostname =  system(commandKernelHostname.c_str())) != 0 ){
+		if ((statuscodeHosts =  system(commandHosts.c_str())) != 0 ){
 
-		std::cout << "Write to /proc/sys/kernel/hostname: \e[31mFAILED!\e[0m" << std::endl;
+			std::cout << "Write to /etc/hosts: \t\e[31mFAILED!\e[0m" << std::endl;
 
-	}
-
-	if ((statuscodeEtcHostname =  system(commandEtcHostname.c_str())) != 0 ){
-
-		std::cout << "Write /etc/hostname: \t\e[31mFAILED!\e[0m" << std::endl;
-
-	}
-
-	if ((statuscodeHosts =  system(commandHosts.c_str())) != 0 ){
-
-		std::cout << "Write to /etc/hosts: \t\e[31mFAILED!\e[0m" << std::endl;
-
-	}
+		}
 
 
-	int changeResult = statuscodeKernelHostname + statuscodeEtcHostname + statuscodeHosts + statuscodeXauth;
-	std::cout << "Set hostname to \"" << hostname << "\":\t";
+		int changeResult = statuscodeKernelHostname + statuscodeEtcHostname + statuscodeHosts + statuscodeXauth;
+		std::cout << "Set hostname to \"" << hostname << "\":\t";
 
-	if (changeResult == 0) {
+		if (changeResult == 0) {
 
-		std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
-	} else {
+		} else {
 
-		std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
 
-	}
+		}
 }
 
 void authChown(){
@@ -472,7 +452,6 @@ void authChown(){
 			std::cout << "Change owner to ICEauth: \e[31mFAILED!\e[0m" << std::endl;
 
 		}
-
 }
 
 void saveDefaultMac(std::string interface){
@@ -519,7 +498,6 @@ std::string getActualMac(std::string interface){
 		int statuscode;
 		std::string actualmac;
 		std::string commandWrite = "cat /sys/class/net/" + interface + "/address > /tmp/actualmac";
-		std::string commandRemove = "rm -f /tmp/actualmac";
 
 		if ((statuscode = system(commandWrite.c_str())) != 0 ){
 
@@ -543,7 +521,7 @@ std::string getActualMac(std::string interface){
 
 		}
 
-		if ((statuscode =  system(commandRemove.c_str())) != 0 ){
+		if ((statuscode =  system("rm -f /tmp/actualmac")) != 0 ){
 
 			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
 
@@ -573,11 +551,10 @@ void setMac(std::string interface, std::string mac){
 void setDuppyNetworkRandom(){
 
 		int statusCode;
-		std::string command = "cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/";
 
 		std::cout << "Insert duppynetworkRandom.conf: ";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -591,11 +568,10 @@ void setDuppyNetworkRandom(){
 void setDuppyNetworkPreserve(){
 
 		int statusCode;
-		std::string command = "cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/";
 
 		std::cout << "Insert duppynetworkRandom.conf: ";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -609,11 +585,10 @@ void setDuppyNetworkPreserve(){
 void deleteDuppynetworkRandom(){
 
 		int statusCode;
-		std::string command = "rm -f /etc/NetworkManager/conf.d/duppynetworkRandom.conf";
 
 		std::cout << "Remove duppynetworkRandom.conf: ";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("rm -f /etc/NetworkManager/conf.d/duppynetworkRandom.conf")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -627,11 +602,10 @@ void deleteDuppynetworkRandom(){
 void deleteDuppynetworkPreserve(){
 
 		int statusCode;
-		std::string command = "rm -f /etc/NetworkManager/conf.d/duppynetworkPreserve.conf";
 
 		std::cout << "Remove duppynetworkRandom.conf: ";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("rm -f /etc/NetworkManager/conf.d/duppynetworkPreserve.conf")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -758,11 +732,10 @@ void enableICMP(){
 void removeKnownAP(){
 
 		int statusCode;
-		std::string command = "mv -f /etc/NetworkManager/system-connections/* /tmp/duppy/known_ap/";
 
 		std::cout << "Temporary remove known APs: \t";
 
-		if ((statusCode = system(command.c_str())) == 0){
+		if ((statusCode = system("mv -f /etc/NetworkManager/system-connections/* /tmp/duppy/known_ap/")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -776,12 +749,10 @@ void removeKnownAP(){
 void setBackKnownAP(){
 
 		int statusCode;
-		std::string commandMove = "mv -f /tmp/duppy/known_ap/* /etc/NetworkManager/system-connections/";
-		std::string commandRm = "rm -f /etc/NetworkManager/system-connections/*";
 
 		std::cout << "Remove the used AP: \t\t";
 
-		if ((statusCode = system(commandRm.c_str())) == 0){
+		if ((statusCode = system("rm -f /etc/NetworkManager/system-connections/*")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -795,7 +766,7 @@ void setBackKnownAP(){
 
 		std::cout << "Set back known APs: \t\t";
 
-		if ((statusCode = system(commandMove.c_str())) == 0){
+		if ((statusCode = system("mv -f /tmp/duppy/known_ap/* /etc/NetworkManager/system-connections/")) == 0){
 
 			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
 
@@ -846,9 +817,6 @@ std::string checkDuppyStatus(){
 int main(int argc, char* argv[]){
 
 
-	std::string start = "start";
-	std::string stop = "stop";
-	std::string check = "check";
 	std::string initCommand;
 	std::string selectedInterface;
 	std::string selectedMac;
