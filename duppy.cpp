@@ -52,15 +52,15 @@ void removeDirectories(){
 
 std::string getUser(){
 
-	int statuscode;
-	std::string user;
+		int statuscode;
+		std::string user;
 
-	if ((statuscode = system("ls /home/ > /tmp/duppy/user")) != 0 ){
+		if ((statuscode = system("logname > /tmp/duppy/user")) != 0 ){
 
-		std::cout << "Save user: \e[31mFAILED!\e[0m" << std::endl;
-		std::exit(1);
+			std::cout << "Save user: \e[31mFAILED!\e[0m" << std::endl;
+			std::exit(1);
 
-	}
+		}
 
 		//If dont declare here myfile, the open fail
 		std::ifstream myfile ("/tmp/duppy/user");
@@ -331,37 +331,21 @@ std::string getDefaultHostname(){
 
 std::string getActualHostname(){
 
-		int statuscode;
-		std::string actualhostname;
+		std::ifstream myfile ("/etc/hostname");
+		std::string actualHostname;
 
-		if ((statuscode = system("hostname > /tmp/actualhostname")) != 0 ){
+		if (myfile.is_open()){
 
-			std::cout << "Save the actual hostname: \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		//If dont declare here myfile, the open fail
-		std::ifstream myfile ("/tmp/actualhostname");
-
-		if (myfile.is_open()) {
-
-			getline(myfile, actualhostname);
+			getline(myfile, actualHostname);
+			myfile.close();
 
 		} else {
 
-			std::cout << "Open \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
+			std::cout << "Open /etc/hostname: \e[31mFAILED!\e[0m" << std::endl;;
 
 		}
 
-		if ((statuscode =  system("rm -f /tmp/actualhostname")) != 0 ){
-
-			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-		return actualhostname;
+		return actualHostname;
 }
 
 void setHostname(std::string hostname, std::string initCommand){
@@ -495,39 +479,22 @@ std::string getDefaultMac(){
 
 std::string getActualMac(std::string interface){
 
-		int statuscode;
-		std::string actualmac;
-		std::string commandWrite = "cat /sys/class/net/" + interface + "/address > /tmp/actualmac";
+		std::string PATH = "/sys/class/net/" + interface + "/address";
+		std::ifstream myfile (PATH);
+		std::string actualMac;
 
-		if ((statuscode = system(commandWrite.c_str())) != 0 ){
+		if (myfile.is_open()){
 
-			std::cout << "Save the actual mac: \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		//If dont declare here myfile, the open fail
-		std::ifstream myfile ("/tmp/actualmac");
-
-
-		if (myfile.is_open()) {
-
-			getline(myfile, actualmac);
+			getline(myfile, actualMac);
+			myfile.close();
 
 		} else {
 
-			std::cout << "Open \"/tmp/actualmac\": \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
+			std::cout << "Open /sys/class/net/../address: \e[31mFAILED!\e[0m";
 
 		}
 
-		if ((statuscode =  system("rm -f /tmp/actualmac")) != 0 ){
-
-			std::cout << "Remove \"/tmp/actualhostname\": \e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-		return actualmac;
+		return actualMac;
 }
 
 void setMac(std::string interface, std::string mac){
@@ -884,6 +851,9 @@ int main(int argc, char* argv[]){
 		sleep(1);
 
 		startNetworkManager();
+		sleep(1);
+
+		authChown();
 		sleep(1);
 
 		notify("Started");
