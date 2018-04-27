@@ -454,6 +454,57 @@ void authChown(){
 		}
 }
 
+void setDuppyNetworkRandom(){
+
+    int statusCode;
+
+    std::cout << "Insert duppynetworkRandom.conf: ";
+
+    if ((statusCode = system("cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/")) == 0){
+
+        std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+    } else {
+
+        std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+    }
+}
+
+void setDuppyNetworkPreserve(){
+
+    int statusCode;
+
+    std::cout << "Insert duppynetworkPreserve.conf: ";
+
+    if ((statusCode = system("cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/")) == 0){
+
+        std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+    } else {
+
+        std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+    }
+}
+
+void deleteDuppynetwork(){
+
+    int statusCode;
+
+    std::cout << "Remove duppynetwork:\t\t";
+
+    if ((statusCode = system("rm -f /etc/NetworkManager/conf.d/duppynetwork*")) == 0){
+
+        std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+
+    } else {
+
+        std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+
+    }
+}
+
 void saveDefaultMac(std::string interface){
 
 		int statusCode;
@@ -548,72 +599,30 @@ void setMac(std::string interface, std::string mac){
 		}
 }
 
-void setDuppyNetworkRandom(){
+void workWithMac(std::string initCommand, bool isMac, std::string interface, std::string selectedMac){
 
-		int statusCode;
+    std::string defaultMac = getDefaultMac();
 
-		std::cout << "Insert duppynetworkRandom.conf: ";
+    if (initCommand == "start"){
 
-		if ((statusCode = system("cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/")) == 0){
+        if (isMac){
 
-			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
+            setDuppyNetworkPreserve();
+            setMac(interface, selectedMac);
 
-		} else {
+        } else {
 
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
+            setDuppyNetworkRandom();
 
-		}
-}
+        }
 
-void setDuppyNetworkPreserve(){
+    } else if (initCommand == "stop"){
 
-		int statusCode;
+        deleteDuppynetwork();
+        setMac(interface, defaultMac);
+        std::cout << "default mac: " << defaultMac << std::endl;
 
-		std::cout << "Insert duppynetworkRandom.conf: ";
-
-		if ((statusCode = system("cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/")) == 0){
-
-			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
-
-		} else {
-
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
-
-		}
-}
-
-void deleteDuppynetworkRandom(){
-
-		int statusCode;
-
-		std::cout << "Remove duppynetworkRandom.conf: ";
-
-		if ((statusCode = system("rm -f /etc/NetworkManager/conf.d/duppynetworkRandom.conf")) == 0){
-
-			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
-
-		} else {
-
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
-
-		}
-}
-
-void deleteDuppynetworkPreserve(){
-
-		int statusCode;
-
-		std::cout << "Remove duppynetworkRandom.conf: ";
-
-		if ((statusCode = system("rm -f /etc/NetworkManager/conf.d/duppynetworkPreserve.conf")) == 0){
-
-			std::cout << "\e[32mSUCCESS!\e[0m" << std::endl;
-
-		} else {
-
-			std::cout << "\e[31mFAILED!\e[0m" << std::endl;
-
-		}
+    }
 }
 
 void ignoreArp(std::string interface){
@@ -791,9 +800,9 @@ void notify(std::string text){
 
 void printHelp(){
 
-		std::cout << "                start" << std::endl;
-		std::cout << "Usage: ./duppy  stop   <interface>" << std::endl;
-		std::cout << "                check\n" << std::endl;
+		std::cout << "                start"<< std::endl;
+		std::cout << "Usage: ./duppy  stop   <interface>  <MAC>"      << std::endl;
+		std::cout << "                check\n"<< std::endl;
 		exit(1);
 
 }
@@ -820,6 +829,7 @@ int main(int argc, char* argv[]){
 	std::string initCommand;
 	std::string selectedInterface;
 	std::string selectedMac;
+	bool isMac;
 
 	checkRoot();
 	sleep(1);
@@ -829,12 +839,15 @@ int main(int argc, char* argv[]){
 
 		initCommand = argv[1];
 		selectedInterface = checkInterface(argv[2]);
+		selectedMac = "";
+		isMac = false;
 
 	} else if (argc == 4) {
 
 		initCommand = argv[1];
-		selectedMac = argv[2];
-		selectedInterface = checkInterface(argv[3]);
+		selectedInterface = checkInterface(argv[2]);
+        selectedMac = argv[3];
+		isMac = true;
 
 	} else {
 
@@ -845,7 +858,6 @@ int main(int argc, char* argv[]){
 
 	if (initCommand == "start" ){
 
-		//start Duppy
 
 		createDiretories();
 		sleep(1);
@@ -862,7 +874,7 @@ int main(int argc, char* argv[]){
 		ifconfigDown(selectedInterface.c_str());
 		sleep(1);
 
-		setDuppyNetworkRandom();
+		workWithMac(initCommand, isMac, selectedInterface, selectedMac);
 		sleep(1);
 
 		setHostname(getRandomHostname(), initCommand);
@@ -892,9 +904,7 @@ int main(int argc, char* argv[]){
 
 	} else if (initCommand  == "stop" ){
 
-		//stop duppy
 
-		std::string defaultMac = getDefaultMac();
 		std::string defaultHostname = getDefaultHostname();
 
 		stopNetworkManager();
@@ -906,10 +916,7 @@ int main(int argc, char* argv[]){
 		setHostname(defaultHostname, initCommand);
 		sleep(1);
 
-		deleteDuppynetworkRandom();
-		sleep(1);
-
-		setMac(selectedInterface.c_str(), defaultMac);
+        workWithMac(initCommand, isMac, selectedInterface, selectedMac);
 		sleep(1);
 
 		allowArp(selectedInterface.c_str());
@@ -936,7 +943,7 @@ int main(int argc, char* argv[]){
 		removeDirectories();
 		sleep(1);
 
-		notify("Stopped\nMAC: " + defaultMac + "\nHostname: " + defaultHostname);
+		notify("Stopped\nMAC: " + getActualMac(selectedInterface) + "\nHostname: " + defaultHostname);
 		sleep(1);
 
 	} else if (initCommand == "check" ){
