@@ -582,7 +582,6 @@ void workWithMac(std::string initCommand, bool isMac, std::string interface, std
             setDuppyNetworkRandom();
 
         }
-
     } else if (initCommand == "stop"){
 
         deleteDuppynetwork();
