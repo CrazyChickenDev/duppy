@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <random>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 
 
 void checkRoot(){
@@ -22,21 +25,17 @@ void checkRoot(){
 
 void createDiretories(){
 
-		int statusCode;
+        if ((mkdir("/tmp/duppy", 0700)) != 0) {
 
-		if ((statusCode = system("mkdir /tmp/duppy")) != 0 ){
+            std::cout << "Create dir in /tmp: \e[31mFAILED!!\e[0m";
+            std::exit(1);
+        }
 
-			std::cout << "Create dir in /tmp: \e[31mFAILED!!\e[0m";
-			std::exit(1);
+        if ((mkdir("/tmp/duppy/known_ap", 0700)) != 0) {
 
-		}
-
-		if ((statusCode = system("mkdir /tmp/duppy/known_ap")) != 0 ){
-
-			std::cout << "Create dir in /tmp/duppy: \e[31mFAILED!!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
+            std::cout << "Create dir in /tmp/duppy: \e[31mFAILED!!\e[0m";
+            std::exit(1);
+        }
 }
 
 void removeDirectories(){
@@ -442,7 +441,7 @@ void setDuppyNetworkRandom(){
 
     int statusCode;
 
-    std::cout << "Insert duppynetworkRandom.conf: ";
+    std::cout << "Insert random.conf: ";
 
     if ((statusCode = system("cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/")) == 0){
 
@@ -459,7 +458,7 @@ void setDuppyNetworkPreserve(){
 
     int statusCode;
 
-    std::cout << "Insert duppynetworkPreserve.conf: ";
+    std::cout << "Insert preserve.conf: ";
 
     if ((statusCode = system("cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/")) == 0){
 
@@ -586,7 +585,6 @@ void workWithMac(std::string initCommand, bool isMac, std::string interface, std
 
         deleteDuppynetwork();
         setMac(interface, defaultMac);
-        std::cout << "default mac: " << defaultMac << std::endl;
 
     }
 }
