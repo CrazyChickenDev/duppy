@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sys/stat.h>
 #include <sys/types.h>
-
+#include <pwd.h>
 
 
 void checkRoot(){
@@ -49,118 +49,26 @@ void removeDirectories(){
 		}
 }
 
-std::string getUser(){
-
-		int statuscode;
-		std::string user;
-
-		if ((statuscode = system("logname > /tmp/duppy/user")) != 0 ){
-
-			std::cout << "Save user: \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		//If dont declare here myfile, the open fail
-		std::ifstream myfile ("/tmp/duppy/user");
-
-		if (myfile.is_open()) {
-
-			getline(myfile, user);
-
-		} else {
-
-			std::cout << "Open \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		if ((statuscode =  system("rm -f /tmp/duppy/user")) != 0 ){
-
-			std::cout << "Remove \"/tmp/duppy/user\": \e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-		return user;
-}
-
 std::string getHomeFolder() {
 
-    std::string folder = "/home/" + getUser();
+		std::string username = getlogin();
+    std::string folder = "/home/" + username;
 
     return folder;
 }
 
-int getUID(){
+uid_t getUID(){
 
-		int statuscode;
-		std::string userid;
-		std::string commandWrite = "id -u " + getUser() + "> /tmp/duppy/userid";
+		struct passwd *pwd = getpwnam(getlogin());
+		return pwd -> pw_uid;
 
-		if ((statuscode = system(commandWrite.c_str())) != 0 ){
-
-			std::cout << "Save user id: \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		//If dont declare here myfile, the open fail
-		std::ifstream myfile ("/tmp/duppy/userid");
-
-		if (myfile.is_open()) {
-
-			getline(myfile, userid);
-
-		} else {
-
-			std::cout << "Open \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		if ((statuscode =  system("rm -f /tmp/duppy/userid")) != 0 ){
-
-			std::cout << "Remove \"/tmp/duppy/userid\": \e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-		return std::stoi(userid);
 }
 
-int getGID(){
+gid_t getGID(){
 
-		int statuscode;
-		std::string groupid;
-		std::string commandWrite = "id -g " + getUser() + "> /tmp/duppy/groupid";
+		struct passwd *pwd = getpwnam(getlogin());
+		return pwd -> pw_gid;
 
-		if ((statuscode = system(commandWrite.c_str())) != 0 ){
-
-			std::cout << "Save group id: \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		//If dont declare here myfile, the open fail
-		std::ifstream myfile ("/tmp/duppy/groupid");
-
-		if (myfile.is_open()) {
-
-			getline(myfile, groupid);
-
-		} else {
-
-			std::cout << "Open \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
-			std::exit(1);
-
-		}
-
-		if ((statuscode =  system("rm -f /tmp/duppy/groupid")) != 0 ){
-
-			std::cout << "Remove \"/tmp/duppy/groupid\": \e[31mFAILED!\e[0m" << std::endl;
-
-		}
-
-		return std::stoi(groupid);
 }
 
 void stopNetworkManager(){
@@ -441,7 +349,7 @@ void setDuppyNetworkRandom(){
 
     int statusCode;
 
-    std::cout << "Insert random.conf: ";
+    std::cout << "Insert random.conf: \t\t";
 
     if ((statusCode = system("cp duppynetworkRandom.conf /etc/NetworkManager/conf.d/")) == 0){
 
@@ -458,7 +366,7 @@ void setDuppyNetworkPreserve(){
 
     int statusCode;
 
-    std::cout << "Insert preserve.conf: ";
+    std::cout << "Insert preserve.conf: \t\t";
 
     if ((statusCode = system("cp duppynetworkPreserve.conf /etc/NetworkManager/conf.d/")) == 0){
 
