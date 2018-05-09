@@ -305,9 +305,7 @@ void setHostname(std::string hostname, std::string initCommand){
 		std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
 		std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
 		std::string commandHosts = "sed -i s/" + actualHostname + "/" + hostname + "/g /etc/hosts";
-		//std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
 		std::string commandXauthAdd = "xauth add " + hostname + "/unix:0 . " + cookie;
-		//std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
 		std::string commandXauthRemove = "xauth remove " + actualHostname + "/unix:0";
 
 
