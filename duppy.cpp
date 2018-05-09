@@ -255,37 +255,73 @@ std::string getActualHostname(){
 		return actualHostname;
 }
 
+std::string xauthCookie(){
+
+		std::string line, cookie, mit;
+
+	  mit = "MIT-MAGIC-COOKIE-1";
+
+	 	if (system("xauth list > /tmp/duppy/xauth") != 0){
+
+			std::cout << "Save xauth list: \e[31mFAILED!\e[0m" << std::endl;
+			return "ERROR";
+			std::exit(1);
+
+		}
+
+	  std::ifstream file ("/tmp/duppy/xauth");
+
+	  if (file.is_open()){
+
+	      getline(file, line);
+
+	  } else {
+
+			std::cout << "Open /tmp/duppy/xauth: \e[31mFAILED!\e[0m" << std::endl;
+
+		}
+
+	  cookie = line.substr(line.find(mit) + mit.length() + 2);
+
+	  if (remove("/tmp/duppy/xauth") != 0) {
+
+	    std::cout << "Failed to remove \"xauth.txt\"";
+
+	  }
+
+		return cookie;
+}
+
 void setHostname(std::string hostname, std::string initCommand){
 
 		int statuscodeKernelHostname;
 		int statuscodeEtcHostname;
 		int statuscodeHosts;
 		int statuscodeXauth;
+		std::string actualHostname = getActualHostname();
+		std::string cookie = xauthCookie();
 
 
 		std::string commandKernelHostname = "echo " + hostname + " > /proc/sys/kernel/hostname";
 		std::string commandEtcHostname = "echo " + hostname + " > /etc/hostname";
-		std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
-		std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
-		std::string commandXauthRemove = "xauth remove " + getActualHostname() + "/unix:0";
+		std::string commandHosts = "sed -i s/" + actualHostname + "/" + hostname + "/g /etc/hosts";
+		//std::string commandHosts = "sed -i \'s/127.0.1.1.*/127.0.1.1\\t\'\"" + hostname + "\"\'/g\' /etc/hosts";
+		std::string commandXauthAdd = "xauth add " + hostname + "/unix:0 . " + cookie;
+		//std::string commandXauthAdd = "su -c \"xauth add $(xauth -b list | sed \'s/^.*\\//\'\"" + hostname + "\"\'\\//g\' | awk \'NR==1 {sub($1,\"\\\"&\\\"\"); print}\')\"";
+		std::string commandXauthRemove = "xauth remove " + actualHostname + "/unix:0";
 
-		//switch from start/stop
 
-		if (initCommand == "start"){
+		if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
 
-			if ((statuscodeXauth =  system(commandXauthAdd.c_str())) != 0 ){
+			std::cout << "Add Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
 
-				std::cout << "Add Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
+		}
 
-			}
 
-		} else if (initCommand == "stop") {
+		if ((statuscodeXauth =  system(commandXauthRemove.c_str())) != 0 ){
 
-			if ((statuscodeXauth =  system(commandXauthRemove.c_str())) != 0 ){
+			std::cout << "Remove Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
 
-				std::cout << "Remove Xauth entry: \t\t\e[31mFAILED!\e[0m" << std::endl;
-
-			}
 		}
 
 		if ((statuscodeKernelHostname =  system(commandKernelHostname.c_str())) != 0 ){
