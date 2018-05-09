@@ -13,7 +13,7 @@ void checkRoot(){
 
 		if (geteuid() != 0){
 
-			std::cout << "\n\tRun as ROOT!\n" << std::endl;;
+			std::cout << "\nRun as \e[31mROOT\e[0m!\n" << std::endl;
 			std:: exit(1);
 
 		} else {
