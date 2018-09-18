@@ -6,6 +6,9 @@ NORMAL="\033[0m"
 
 SELECTED_INTERFACE=("")
 SELECTED_MAC=("")
+TOR_EXCLUDE="192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+TOR_UID="debian-tor"
+TOR_PORT="9040"
 
 check_interface() {
 
@@ -44,6 +47,51 @@ check_mac() {
     else
         echo -e "${YELLOW}Selected mac: '$1' ${NORMAL}"
         SELECTED_MAC=("$1")
+    fi
+
+}
+
+check_tor_command(){
+
+    if [ $1 = "start" ]
+    then
+        TOR_COMMAND=("start")
+    elif [ $1 = "stop" ]
+    then
+        TOR_COMMAND=("stop")
+    else
+        echo
+        echo -e "${RED}Invalid option: '$1' ${NORMAL}"
+        echo -e "${RED}Valid options: 'start' or 'stop' ${NORMAL}"
+        echo
+        exit
+    fi
+}
+
+init() {
+
+    echo -n -e "${YELLOW}Killing some application:\t\t\t"
+    killall -q chrome dropbox iceweasel skype icedove thunderbird firefox firefox-esr \
+    chromium xchat hexchat transmission steam firejail
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    echo -n -e "${YELLOW}Delete some cache:\t\t\t"
+    bleachbit -c adobe_reader.cache chromium.cache chromium.current_session chromium.history \
+    elinks.history emesene.cache epiphany.cache firefox.url_history flash.cache flash.cookies \
+    google_chrome.cache google_chrome.history  links2.history opera.cache opera.search_history \
+    opera.url_history &> /dev/null
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
     fi
 
 }
@@ -479,6 +527,120 @@ stop() {
 
 }
 
+start_tor() {
+
+    if [[ ! $(dpkg -s nscd) = *"not installed"* ]]
+    then
+        echo -n -e "${YELLOW}Stop nscd:\t\t\t\t"
+        service nscd stop
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
+    if [[ ! $(dpkg -s dnsmasq) = *"not installed"* ]]
+    then
+        echo -n -e "${YELLOW}Stop dnsmasq:\t\t\t\t"
+        service dnsmasq stop
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
+    echo -n -e "${YELLOW}Stop resolvconf:\t\t\t"
+    service resolvconf stop
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}Kill others:\t\t\t\t"
+    killall dnsmasq nscd resolvconf && killall -9 dnsmasq
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}Starting TOR:\t\t\t"
+    systemctl start tor
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}Save DNS settings:\t\t\t"
+    cp /etc/resolv.conf /etc/resolv.conf.bak && \
+    echo -e 'nameserver 127.0.0.1' >> /etc/resolv.conf && \
+    echo -e 'nameserver 139.99.96.146' >> /etc/resolv.conf && \
+    echo -e 'nameserver 37.59.40.15' >> /etc/resolv.conf && \
+    echo -e 'nameserver 185.121.177.177' >> /etc/resolv.conf
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}Disable IPv6:\t\t\t"
+    sysctl -w -q net.ipv6.conf.all.disable_ipv6=1 && sysctl -w -q net.ipv6.conf.default.disable_ipv6=1
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}Save iptables rules:\t\t\t"
+    iptables-save > iptables.rules
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    COUNTER=("0")
+    echo -n -e "${YELLOW}Configure iptables:\t\t\t"
+    iptables -F || ((COUNTER++))
+    iptables -t nat -F || ((COUNTER++))
+    iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN || ((COUNTER++))
+	iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53 || ((COUNTER++))
+    iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 53 || ((COUNTER++))
+	iptables -t nat -A OUTPUT -p udp -m owner --uid-owner $TOR_UID -m udp --dport 53 -j REDIRECT --to-ports 53 || ((COUNTER++))
+    iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports $TOR_PORT || ((COUNTER++))
+	iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports $TOR_PORT || ((COUNTER++))
+	for NET in $TOR_EXCLUDE 127.0.0.0/9 127.128.0.0/10
+    do
+        iptables -t nat -A OUTPUT -d $NET -j RETURN || ((COUNTER++))
+	    iptables -A OUTPUT -d "$NET" -j ACCEPT || ((COUNTER++))
+    done
+	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TOR_PORT || ((COUNTER++))
+	iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports $TOR_PORT || ((COUNTER++))
+	iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports $TOR_PORT || ((COUNTER++))
+	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT || ((COUNTER++))
+	iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT || ((COUNTER++))
+	iptables -A OUTPUT -j REJECT || ((COUNTER++))
+    if [ $COUNTER -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+    
+}
+
 if [ $# -eq "0" ]
 then
     echo
@@ -488,7 +650,7 @@ then
     echo "  --mac <address>             Set specific MAC address"
     echo "                              If you want random MAC address,"
     echo "                              just don't use '--mac' argument"
-    echo "  --tor                       Start TOR with Duppy"
+    echo "  --tor <start | stop>        Start/Stop TOR"
     echo "  --vpn                       Start VPN with Duppy"
     echo
     exit
@@ -526,7 +688,8 @@ do
             ;;
         --tor)
             TOR=("1")
-            shift
+            check_tor_command $2
+            shift 2
             ;;
         --vpn)
             VPN=("1")
@@ -554,6 +717,8 @@ do
             ;;
     esac
 done
+
+init
 
 if [ $START ]
 then
