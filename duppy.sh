@@ -70,7 +70,7 @@ check_tor_command(){
 
 init() {
 
-    echo -n -e "${YELLOW}Killing some application:\t\t\t"
+    echo -n -e "${YELLOW}Killing some application:\t\t"
     killall -q chrome dropbox iceweasel skype icedove thunderbird firefox firefox-esr \
     chromium xchat hexchat transmission steam firejail
     if [ $? -eq "0" ]
@@ -133,6 +133,14 @@ check_duppy() {
         echo -e "${RED}$ACTUAL_MAC ${NORMAL}"
     else
         echo -e "${GREEN}$ACTUAL_MAC ${NORMAL}"
+    fi
+
+    echo -n -e "${YELLOW}TOR:\t\t"
+    if [[ $(curl -s https://start.parrotsec.org/ip/) = *"TOR"* ]]
+    then
+        echo -e "${GREEN}ENABLED ${NORMAL}"
+    else
+        echo -e "${RED}DISABLED ${NORMAL}"
     fi
     echo
 
@@ -529,7 +537,7 @@ stop() {
 
 start_tor() {
 
-    if [[ ! $(dpkg -s nscd) = *"not installed"* ]]
+    if [[ ! $(dpkg -s nscd 2>&1) = *"not installed"* ]]
     then
         echo -n -e "${YELLOW}Stop nscd:\t\t\t\t"
         service nscd stop
@@ -541,7 +549,7 @@ start_tor() {
         fi
     fi
 
-    if [[ ! $(dpkg -s dnsmasq) = *"not installed"* ]]
+    if [[ ! $(dpkg -s dnsmasq 2>&1) = *"not installed"* ]]
     then
         echo -n -e "${YELLOW}Stop dnsmasq:\t\t\t\t"
         service dnsmasq stop
@@ -562,8 +570,10 @@ start_tor() {
         echo -e "${RED}FAILED${NORMAL}"
     fi
 
+    sleep 1
+
     echo -n -e "${YELLOW}Kill others:\t\t\t\t"
-    killall dnsmasq nscd resolvconf && killall -9 dnsmasq
+    killall -q dnsmasq nscd resolvconf && killall -9 dnsmasq
     if [ $? -eq "0" ]
     then
         echo -e "${GREEN}SUCCESS${NORMAL}"
@@ -571,7 +581,9 @@ start_tor() {
         echo -e "${RED}FAILED${NORMAL}"
     fi
 
-    echo -n -e "${YELLOW}Starting TOR:\t\t\t"
+    sleep 1
+
+    echo -n -e "${YELLOW}Starting TOR:\t\t\t\t"
     systemctl start tor
     if [ $? -eq "0" ]
     then
@@ -579,6 +591,8 @@ start_tor() {
     else
         echo -e "${RED}FAILED${NORMAL}"
     fi
+
+    sleep 1
 
     echo -n -e "${YELLOW}Save DNS settings:\t\t\t"
     cp /etc/resolv.conf /etc/resolv.conf.bak && \
@@ -593,7 +607,9 @@ start_tor() {
         echo -e "${RED}FAILED${NORMAL}"
     fi
 
-    echo -n -e "${YELLOW}Disable IPv6:\t\t\t"
+    sleep 1
+
+    echo -n -e "${YELLOW}Disable IPv6:\t\t\t\t"
     sysctl -w -q net.ipv6.conf.all.disable_ipv6=1 && sysctl -w -q net.ipv6.conf.default.disable_ipv6=1
     if [ $? -eq "0" ]
     then
@@ -601,6 +617,8 @@ start_tor() {
     else
         echo -e "${RED}FAILED${NORMAL}"
     fi
+
+    sleep 1
 
     echo -n -e "${YELLOW}Save iptables rules:\t\t\t"
     iptables-save > iptables.rules
@@ -610,6 +628,8 @@ start_tor() {
     else
         echo -e "${RED}FAILED${NORMAL}"
     fi
+
+    sleep 1
 
     COUNTER=("0")
     echo -n -e "${YELLOW}Configure iptables:\t\t\t"
@@ -638,7 +658,125 @@ start_tor() {
     else
         echo -e "${RED}FAILED${NORMAL}"
     fi
-    
+
+    sleep 1
+
+    #check the script
+    IP=$(curl -s https://start.parrotsec.org/ip/)
+    if [[ $IP = *"TOR"* ]]
+    then
+        echo
+        echo -e "${BLUE}TOR started successfully ! ${NORMAL}"
+        echo -e "${YELLOW}IP: ${GREEN}$IP${NORMAL}"
+        echo
+    else
+        echo
+        echo -e "${RED}Can't connect to TOR ! ${NORMAL}"
+        echo -e "${YELLOW}IP: ${RED}$IP ${NORMAL}"
+        echo -e "${YELLOW}Run: '--tor stop' ${NORMAL}"
+        echo
+    fi
+
+}
+
+stop_tor(){
+
+    echo -n -e "${YELLOW}Flush iptables:\t\t\t\t"
+	iptables -F	&& iptables -t nat -F
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    if [ -f iptables.rules ]
+    then
+        echo -n -e "${YELLOW}Restore iptables rules:\t\t\t"
+        iptables-restore < iptables.rules && rm iptables.rules
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
+    sleep 1
+
+    if [ -e /etc/resolv.conf.bak ]
+    then
+        echo -n -e "${YELLOW}Restore DNS settings:\t\t\t"
+        rm /etc/resolv.conf && mv /etc/resolv.conf.bak /etc/resolv.conf
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
+    sleep 1
+
+    echo -n -e "${YELLOW}Enable IPv6:\t\t\t\t"
+    sysctl -w -q net.ipv6.conf.all.disable_ipv6=0 && sysctl -w -q net.ipv6.conf.default.disable_ipv6=0
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    echo -n -e "${YELLOW}Stop TOR:\t\t\t\t"
+    service tor stop && killall tor
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    echo -n -e "${YELLOW}Start resolvconf:\t\t\t"
+    service resolvconf start
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    if [[ ! $(dpkg -s dnsmasq 2>&1) = *"not installed"* ]]
+    then
+        echo -n -e "${YELLOW}Start dnsmasq:\t\t\t\t"
+        service dnsmasq start
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
+    if [[ ! $(dpkg -s nscd 2>&1) = *"not installed"* ]]
+    then
+        echo -n -e "${YELLOW}Start nscd:\t\t\t\t"
+        service nscd start
+        if [ $? -eq "0" ]
+        then
+            echo -e "${GREEN}SUCCESS${NORMAL}"
+        else
+            echo -e "${RED}FAILED${NORMAL}"
+        fi
+    fi
+
 }
 
 if [ $# -eq "0" ]
@@ -718,15 +856,27 @@ do
     esac
 done
 
-init
 
 if [ $START ]
 then
+    init
     start
 elif [ $STOP ]
 then
+    init
     stop
 elif [ $CHECK ]
 then
     check_duppy
+fi
+
+if [ $TOR ]
+then
+    if [ $TOR_COMMAND = "start" ]
+    then
+        start_tor
+    elif [ $TOR_COMMAND = "stop" ]
+    then
+        stop_tor
+    fi
 fi
