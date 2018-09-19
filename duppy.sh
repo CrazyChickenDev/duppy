@@ -340,6 +340,18 @@ start() {
 
     sleep 1
 
+    #disable IPv6
+    echo -n -e "${YELLOW}Disable IPv6:\t\t\t\t"
+    sysctl -w -q net.ipv6.conf.all.disable_ipv6=1 && sysctl -w -q net.ipv6.conf.default.disable_ipv6=1
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
     #temporary remove the known APs
     #makes impossible to reconnect by accident
     echo -n -e "${YELLOW}Temporary remove known APs:\t\t"
@@ -498,6 +510,17 @@ stop() {
     #enable ICMP answer
     echo -n -e "${YELLOW}Enable ping response:\t\t\t"
     sysctl -q -w net.ipv4.icmp_echo_ignore_all=0
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    echo -n -e "${YELLOW}Enable IPv6:\t\t\t\t"
+    sysctl -w -q net.ipv6.conf.all.disable_ipv6=0 && sysctl -w -q net.ipv6.conf.default.disable_ipv6=0
     if [ $? -eq "0" ]
     then
         echo -e "${GREEN}SUCCESS${NORMAL}"
