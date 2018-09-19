@@ -146,6 +146,60 @@ check_duppy() {
 
 }
 
+change_hostname(){
+
+    if [ -z $1 ]
+    then
+        echo
+        echo -e "${RED}No hostname specified! ${NORMAL}"
+        echo -e "${YELLOW}Usage: '--hostname <name>' ${NORMAL}"
+        echo
+        exit
+    fi
+
+    echo -n -e "${YELLOW}Change hostname:\t\t\t"
+    DEFAULT_HOSTNAME=$(hostname)
+    HOSTNAME=("$1")
+    MIT_COOKIE=$(xauth -i -b list | awk '{print $3}')
+
+    echo $HOSTNAME > /proc/sys/kernel/hostname && \
+    echo $HOSTNAME > /etc/hostname && \
+    sed -i s/${DEFAULT_HOSTNAME}/${HOSTNAME}/g /etc/hosts && \
+    xauth -i -b add ${HOSTNAME}/unix:0 . $MIT_COOKIE && \
+    xauth -i -b remove $DEFAULT_HOSTNAME/unix:0
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    #change ownership of Xauthority
+    #need for the proper reboot
+    echo -n -e "${YELLOW}Change owner of .Xauthority:\t\t"
+    chown $(logname) /home/$(logname)/.Xauthority
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+    sleep 1
+
+    #change ownership of ICEauthority
+    #need for the proper reboot
+    echo -n -e "${YELLOW}Change owner of .ICEauthority:\t\t"
+    chown $(logname) /home/$(logname)/.ICEauthority
+    if [ $? -eq "0" ]
+    then
+        echo -e "${GREEN}SUCCESS${NORMAL}"
+    else
+        echo -e "${RED}FAILED${NORMAL}"
+    fi
+
+}
+
 start() {
 
     if [ -e /tmp/duppy ]
@@ -788,8 +842,9 @@ then
     echo "  --mac <address>             Set specific MAC address"
     echo "                              If you want random MAC address,"
     echo "                              just don't use '--mac' argument"
-    echo "  --tor <start | stop>        Start/Stop TOR"
-    echo "  --vpn                       Start VPN with Duppy"
+    echo "  --tor <start | stop>        Start TOR with Duppy"
+    echo "                              Don't worry if some killing porcess fail"
+    echo "  --hostname <name>           Change only the hostname"
     echo
     exit
 fi
@@ -829,9 +884,9 @@ do
             check_tor_command $2
             shift 2
             ;;
-        --vpn)
-            VPN=("1")
-            shift
+        --hostname)
+            change_hostname $2
+            shift 2
             ;;
         -h | --help)
             echo
@@ -841,8 +896,9 @@ do
             echo "  --mac <address>             Set specific MAC address"
             echo "                              If you want random MAC address,"
             echo "                              just don't use '--mac' argument"
-            echo "  --tor                       Start TOR with Duppy"
-            echo "  --vpn                       Start VPN with Duppy"
+            echo "  --tor <start | stop>        Start TOR with Duppy"
+            echo "                              Don't worry if some killing porcess fail"
+            echo "  --hostname <name>           Change only the hostname"
             echo
             exit
             ;;
