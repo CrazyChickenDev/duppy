@@ -930,9 +930,11 @@ if [ $TOR ]
 then
     if [ $TOR_COMMAND = "start" ]
     then
+        init
         start_tor
     elif [ $TOR_COMMAND = "stop" ]
     then
+        init
         stop_tor
     fi
 fi
