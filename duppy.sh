@@ -671,8 +671,9 @@ start_tor() {
 
     sleep 1
 
-    echo -n -e "${YELLOW}Save DNS settings:\t\t\t"
-    cp /etc/resolv.conf /etc/resolv.conf.bak && \
+    echo -n -e "${YELLOW}Configure DNS settings:\t\t\t"
+    mv /etc/resolv.conf /etc/resolv.conf.bak && \
+    touch /etc/resolv.conf && \
     echo -e 'nameserver 127.0.0.1' >> /etc/resolv.conf && \
     echo -e 'nameserver 139.99.96.146' >> /etc/resolv.conf && \
     echo -e 'nameserver 37.59.40.15' >> /etc/resolv.conf && \
