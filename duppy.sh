@@ -136,7 +136,7 @@ check_duppy() {
     fi
 
     echo -n -e "${YELLOW}TOR:\t\t"
-    if [[ $(curl -s https://start.parrotsec.org/ip/) = *"TOR"* ]]
+    if [[ $(curl -s https://check.torproject.org/) = *"Congratulations. This browser is configured to use Tor."* ]]
     then
         echo -e "${GREEN}ENABLED ${NORMAL}"
     else
